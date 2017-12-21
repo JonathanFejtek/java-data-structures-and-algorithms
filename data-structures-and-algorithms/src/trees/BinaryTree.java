@@ -8,8 +8,6 @@ public class BinaryTree<T> {
     private BinaryTree<T> left;
     private BinaryTree<T> right;
 
-    public BinaryTree(){}
-
     public BinaryTree(T item){
         this.data = item;
         if(item == null){
@@ -17,14 +15,27 @@ public class BinaryTree<T> {
             this.right = null;
         }
         else{
-            this.left = new BinaryTree<>();
-            this.right = new BinaryTree<>();
+            this.left = new BinaryTree<>(null);
+            this.right = new BinaryTree<>(null);
         }
 
     }
 
     public T getData(){
         return this.data;
+    }
+
+    public static void main(String[] args){
+        BinaryTree<String> bt = new BinaryTree<>("A");
+        bt.insert("B");
+        bt.insert("C");
+        System.out.println(bt.inOrder());
+        bt.delete("A");
+        System.out.println(bt.inOrder());
+
+        bt.delete("B");
+        System.out.println(bt.inOrder());
+
     }
 
     public boolean isEmpty(){
@@ -34,8 +45,8 @@ public class BinaryTree<T> {
     public void insert(T item){
         if(this.isEmpty()){
             this.data = item;
-            this.left = new BinaryTree<>();
-            this.right = new BinaryTree<>();
+            this.left = new BinaryTree<>(null);
+            this.right = new BinaryTree<>(null);
         }
 
         else{
@@ -48,57 +59,92 @@ public class BinaryTree<T> {
         }
     }
 
-//    public void delete(T item){
-//        if(!this.isEmpty()){
-//            if(this.data.equals(item)){
-//                this.deleteRoot();
-//            }
-//        }
-//    }
-//
-//    private T deleteRoot(){
-//
-//        if(this.isEmpty()){
-//            return this.data;
-//        }
-//
-//        else if(isLeaf()){
-//            T temp = this.data;
-//            this.data = null;
-//            this.left = null;
-//            this.right = null;
-//            return temp;
-//        }
-//
-//        else{
-//            if(!right.isEmpty()){
-//                return right.deleteRoot();
-//            }
-//
-//            return left.deleteRoot();
-//
-//        }
-//    }
+
+    public void delete(T item){
+        if(item.equals(this.data)){
+            this.deleteNode();
+        }
+
+        else{
+            if(!this.left.isEmpty()){
+                this.left.delete(item);
+            }
+            if(!this.right.isEmpty()){
+                this.right.delete(item);
+            }
+        }
+    }
+
+    public void deleteNode(){
+        if(this.isEmpty()){
+            return;
+        }
+        else if(this.right.isEmpty()){
+            this.data = this.left.extractLeaf();
+        }
+        else{
+            this.data = this.right.extractLeaf();
+        }
+    }
+
+    public T extractLeaf(){
+        if(this.isEmpty()){
+            return null;
+        }
+        else if(this.right.isEmpty()){
+            T temp = this.data;
+            this.right = this.left.right;
+            this.data = this.left.data;
+            this.left = this.left.left;
+            return temp;
+        }
+        else{
+            return this.right.extractLeaf();
+        }
+
+    }
 
     public ArrayList<T> inOrder(){
+            ArrayList<T> vals = new ArrayList<>();
+            if(isEmpty()){
+                return vals;
+            }
 
-        if(isLeaf()){
-            ArrayList<T> vals = new ArrayList<T>();
-            vals.add(this.data);
+            else{
+                vals.addAll(left.inOrder());
+                vals.add(this.data);
+                vals.addAll(right.inOrder());
+            }
+            return vals;
+    }
+
+    public ArrayList<T> postOrder(){
+        ArrayList<T> vals = new ArrayList<>();
+        if(isEmpty()){
             return vals;
         }
 
         else{
-            ArrayList<T> vals = new ArrayList<>();
-            vals.addAll(left.inOrder());
+            vals.addAll(left.postOrder());
+            vals.addAll(right.postOrder());
             vals.add(this.data);
-            vals.addAll(right.inOrder());
-            return vals;
+
         }
+        return vals;
     }
 
-    public boolean isLeaf(){
-        return (left.isEmpty() && right.isEmpty());
+    public ArrayList<T> preOrder(){
+        ArrayList<T> vals = new ArrayList<>();
+        if(isEmpty()){
+            return vals;
+        }
+
+        else{
+            vals.add(this.data);
+            vals.addAll(left.preOrder());
+            vals.addAll(right.preOrder());
+        }
+        return vals;
     }
 
 }
